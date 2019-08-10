@@ -65,6 +65,8 @@ public abstract class AnimatorAdapter {
                     preSelectViewHolder.onAnimationStateChange(CardStackView.ANIMATION_STATE_END, false);
                 }
                 viewHolder.onAnimationStateChange(CardStackView.ANIMATION_STATE_END, true);
+                mCardStackView.requestLayout();
+                mCardStackView.postInvalidate();
             }
 
             @Override
@@ -96,6 +98,8 @@ public abstract class AnimatorAdapter {
                 super.onAnimationEnd(animation);
                 mCardStackView.setSelectPosition(CardStackView.DEFAULT_SELECT_POSITION);
                 viewHolder.onAnimationStateChange(CardStackView.ANIMATION_STATE_END, false);
+                mCardStackView.requestLayout();
+                mCardStackView.postInvalidate();
             }
 
             @Override

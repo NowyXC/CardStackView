@@ -1,8 +1,10 @@
 # CardStackView
-Show something like cards with 3 kinds of animations(alldown, updown, updownstack). Two ways to scroll the items:one is scroll normal as listview, other one is scroll to overlap first one.
+fork [CardStackView](https://github.com/loopeer/CardStackView)，修复了该项目中嵌套RecyclerView后（超过一屏时）内容显示不全问题。
 
 Screenshot
 ====
+![](/screenshot/screenshot4.gif)  
+
 ![](/screenshot/screenshot1.gif) ![](/screenshot/screenshot2.gif) ![](/screenshot/screenshot3.gif)   
 
 Installation

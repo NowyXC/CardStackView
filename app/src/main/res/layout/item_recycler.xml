@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:stackHeaderHeight="80dp"
+    android:background="#fff"
+    >
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="#eee"
+        android:textColor="#434343"
+        android:text="title"
+        android:gravity="center"
+        android:elevation="3dp"
+        />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#e1e1e1"
+        android:layout_above="@id/title"
+        />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:paddingTop="@dimen/dp_10"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#e1e1e1"
+        android:layout_below="@id/title"
+        />
+</RelativeLayout>

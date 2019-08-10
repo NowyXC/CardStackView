@@ -4,7 +4,9 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.Observable;
+import android.icu.util.Measure;
 import android.os.Build;
+import android.text.SpannableString;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -125,28 +127,51 @@ public class CardStackView extends ViewGroup implements ScrollDelegate {
         int maxWidth = 0;
         mTotalLength = 0;
         mTotalLength += getPaddingTop() + getPaddingBottom();
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int mode = MeasureSpec.getMode(heightMeasureSpec);
         for (int i = 0; i < getChildCount(); i++) {
             final View child = getChildAt(i);
-            measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
-            final int totalLength = mTotalLength;
+
             final LayoutParams lp =
                     (LayoutParams) child.getLayoutParams();
             if (lp.mHeaderHeight == -1) lp.mHeaderHeight = child.getMeasuredHeight();
             final int childHeight = lp.mHeaderHeight;
+            final int totalLength = mTotalLength;
             mTotalLength = Math.max(totalLength, totalLength + childHeight + lp.topMargin +
                     lp.bottomMargin);
             mTotalLength -= mOverlapGaps * 2;
+
+            int bottomOffset = 0;
+            if(getSelectPosition() > -1){
+                int count = getChildCount() - getSelectPosition() - 1;
+                count = count > getNumBottomShow() ? getNumBottomShow() : count;
+                bottomOffset = getOverlapGapsCollapse() * count;
+            }else{
+                bottomOffset = mTotalLength -  mOverlapGaps * 2;
+            }
+            Log.e(TAG,"isExpending:"+isExpending());
+            Log.e(TAG,"selectPos:"+getSelectPosition());
+
+            int newHeightSpec = MeasureSpec.makeMeasureSpec(height - bottomOffset, mode);
+            measureChildWithMargins(child, widthMeasureSpec, 0, newHeightSpec, 0);
+
+
+
             final int margin = lp.leftMargin + lp.rightMargin;
             final int measuredWidth = child.getMeasuredWidth() + margin;
             maxWidth = Math.max(maxWidth, measuredWidth);
         }
 
+
+
         mTotalLength += mOverlapGaps * 2;
-        int heightSize = mTotalLength;
-        heightSize = Math.max(heightSize, mShowHeight);
+        int heightSize = mTotalLength ;
+
+        heightSize = Math.min(heightSize, mShowHeight );
         int heightSizeAndState = resolveSizeAndState(heightSize, heightMeasureSpec, 0);
         setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, 0),
                 heightSizeAndState);
+
     }
 
     @Override
@@ -161,18 +186,31 @@ public class CardStackView extends ViewGroup implements ScrollDelegate {
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             final int childWidth = child.getMeasuredWidth();
-            int childHeight = child.getMeasuredHeight();
+
+            int childHeight = child.getMeasuredHeight() ;
 
             final LayoutParams lp =
                     (LayoutParams) child.getLayoutParams();
             childTop += lp.topMargin;
+
+
+            int bottomOffset = 0;
+//            if(getSelectPosition() > -1){
+//                int count = getChildCount() - getSelectPosition() - 1;
+//                count = count > getNumBottomShow() ? getNumBottomShow() : count;
+//                bottomOffset = getOverlapGapsCollapse() * count;
+//            }
+
             if (i != 0) {
                 childTop -= mOverlapGaps * 2;
-                child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
+                child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight - bottomOffset );
             } else {
-                child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
+                child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight - bottomOffset );
             }
+
+
             childTop += lp.mHeaderHeight;
+
         }
     }
 
@@ -271,6 +309,11 @@ public class CardStackView extends ViewGroup implements ScrollDelegate {
         });
     }
 
+    public void click(int position) {
+        if (position <= DEFAULT_SELECT_POSITION || position > mViewHolders.size() - 1) return;
+        performItemClick(mViewHolders.get(position));
+    }
+
     public void next() {
         if (mSelectPosition == DEFAULT_SELECT_POSITION || mSelectPosition == mViewHolders.size() - 1) return;
         performItemClick(mViewHolders.get(mSelectPosition + 1));
@@ -292,6 +335,8 @@ public class CardStackView extends ViewGroup implements ScrollDelegate {
     private void doCardClickAnimation(final ViewHolder viewHolder, int position) {
         checkContentHeightByParent();
         mAnimatorAdapter.itemClick(viewHolder, position);
+        requestLayout();
+        postInvalidate();
     }
 
     private void initOrResetVelocityTracker() {
@@ -783,8 +828,10 @@ public class CardStackView extends ViewGroup implements ScrollDelegate {
     }
 
     public int getShowHeight() {
+
         return mShowHeight;
     }
+
 
     public int getTotalLength() {
         return mTotalLength;

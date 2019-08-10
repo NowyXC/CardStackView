@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion configs.compileSdkVersion
-    buildToolsVersion configs.buildToolsVersion
 
     defaultConfig {
         applicationId "com.loopeer.test.cardstackview"
@@ -25,4 +24,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile deps.appcompatV7
     compile project(':cardstack')
+    compile "com.android.support:recyclerview-v7:28.0.0"
+    //RecyclerViewAdapterHelper
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.34'
 }
